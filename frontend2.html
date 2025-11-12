@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pothole Detection System</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-white: #ffffff;
+        --text-dark: #1e293b;
+        --text-light: #64748b;
+        --border: #e2e8f0;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* Header */
+      .header {
+        background: var(--bg-white);
+        padding: 20px 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .header-title i {
+        font-size: 2rem;
+        color: var(--primary);
+      }
+
+      .header-title h1 {
+        color: var(--text-dark);
+        font-size: 1.8rem;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-badge {
+        background: var(--bg-light);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+      }
+
+      .role-badge {
+        background: var(--primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      /* Login/Register Form */
+      .auth-container {
+        max-width: 450px;
+        margin: 50px auto;
+        background: var(--bg-white);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .auth-header i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+      }
+
+      .auth-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      .auth-tab {
+        flex: 1;
+        padding: 12px;
+        background: var(--bg-light);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+      }
+
+      .auth-tab.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: border 0.3s;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      select.form-control {
+        cursor: pointer;
+      }
+
+      /* Main Content */
+      .main-content {
+        background: var(--bg-white);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid var(--border);
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        padding: 12px 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--text-light);
+        transition: all 0.3s;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+      }
+
+      .tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        font-weight: 600;
+      }
+
+      .tab i {
+        margin-right: 8px;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Analysis Styles */
+      .analysis-header {
+        margin-bottom: 30px;
+      }
+
+      .analysis-header h2 {
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .stat-card {
+        background: var(--bg-white);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 25px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .stat-icon.blue {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+
+      .stat-icon.yellow {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
+      .stat-icon.green {
+        background: #d1fae5;
+        color: #10b981;
+      }
+
+      .stat-content h3 {
+        font-size: 2rem;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+      }
+
+      .stat-content p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+      }
+
+      .chart-card {
+        background: var(--bg-white);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 25px;
+      }
+
+      .chart-card h3 {
+        color: var(--text-dark);
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+      }
+
+      /* Register Pothole Form */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .file-upload {
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .file-upload:hover {
+        border-color: var(--primary);
+        background: var(--bg-light);
+      }
+
+      .file-upload i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+
+      .file-upload-text {
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      #preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        margin-top: 15px;
+        border-radius: 8px;
+      }
+
+      /* Pothole List */
+      .filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pothole-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .pothole-card {
+        background: var(--bg-white);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+
+      .pothole-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .pothole-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .pothole-content {
+        padding: 20px;
+      }
+
+      .pothole-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-inprocess {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .pothole-details {
+        display: grid;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+      }
+
+      .detail-row i {
+        color: var(--primary);
+        width: 20px;
+      }
+
+      .pothole-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn-sm {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: var(--bg-white);
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+      }
+
+      /* Alert */
+      .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid var(--success);
+      }
+
+      .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid var(--danger);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Loading Spinner */
+      .loading {
+        text-align: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        border: 4px solid var(--border);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .header-title h1 {
+          font-size: 1.4rem;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .pothole-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .filters {
+          flex-direction: column;
+        }
+
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Auth Container -->
+    <div id="authContainer" class="auth-container">
+      <div class="auth-header">
+        <i class="fas fa-road"></i>
+        <h2>Pothole Detection System</h2>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">
+          Login
+        </button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">
+          Register
+        </button>
+      </div>
+
+      <div id="authAlert"></div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" class="form-control" id="loginEmail" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="loginPassword"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" onsubmit="handleRegister(event)" class="hidden">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Name</label>
+          <input type="text" class="form-control" id="registerName" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="registerEmail"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="registerPassword"
+            required
+            minlength="6"
+          />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-user-tag"></i> Role</label>
+          <select class="form-control" id="registerRole" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%">
+          <i class="fas fa-user-plus"></i> Register
+        </button>
+      </form>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="container hidden">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-title">
+          <i class="fas fa-road"></i>
+          <h1>Pothole Detection System</h1>
+        </div>
+        <div class="user-info">
+          <div class="user-badge">
+            <i class="fas fa-user"></i>
+            <span id="userName"></span>
+          </div>
+          <span class="role-badge" id="userRole"></span>
+          <button class="btn btn-danger" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('list')">
+            <i class="fas fa-list"></i> Pothole List
+          </button>
+          <button class="tab" onclick="switchTab('analysis')">
+            <i class="fas fa-chart-bar"></i> Analysis
+          </button>
+          <button class="tab" onclick="switchTab('register')">
+            <i class="fas fa-plus-circle"></i> Register Pothole
+          </button>
+        </div>
+
+        <!-- Alert -->
+        <div id="appAlert"></div>
+
+        <!-- Pothole List Tab -->
+        <div id="listTab" class="tab-content active">
+          <div class="filters">
+            <div class="filter-group">
+              <label><i class="fas fa-filter"></i> Status:</label>
+              <select
+                class="form-control"
+                id="statusFilter"
+                onchange="loadPotholes()"
+                style="width: auto"
+              >
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="inprocess">In Process</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="loadPotholes()">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+
+          <div id="potholeList" class="pothole-grid"></div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysisTab" class="tab-content">
+          <div class="analysis-header">
+            <h2>Pothole Analysis & Statistics</h2>
+          </div>
+
+          <!-- Statistics Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <i class="fas fa-road"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="totalPotholes">0</h3>
+                <p>Total Potholes Reported</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon yellow">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="pendingReports">0</h3>
+                <p>Pending Reports</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-content">
+                <h3 id="completedRepairs">0</h3>
+                <p>Repairs Completed</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3>Potholes Reported by Vehicle</h3>
+              <div class="chart-container">
+                <canvas id="vehicleChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <h3>Pothole Status Breakdown</h3>
+              <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Register Pothole Tab -->
+        <div id="registerTab" class="tab-content">
+          <form id="potholeForm" onsubmit="handleRegisterPothole(event)">
+            <div class="form-group">
+              <label><i class="fas fa-image"></i> Pothole Image *</label>
+              <div
+                class="file-upload"
+                onclick="document.getElementById('imageInput').click()"
+              >
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="file-upload-text">Click to upload image</div>
+                <div
+                  class="file-upload-text"
+                  style="font-size: 0.8rem; color: var(--text-light)"
+                >
+                  (JPG, PNG - Max 5MB)
+                </div>
+              </div>
+              <input
+                type="file"
+                id="imageInput"
+                accept="image/jpeg,image/jpg,image/png"
+                onchange="previewImage(event)"
+                hidden
+                required
+              />
+              <img id="preview-image" class="hidden" />
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label><i class="fas fa-ruler"></i> Distance (meters) *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="distance"
+                  step="0.1"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-car"></i> Vehicle Name *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="vehicleName"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label
+                  ><i class="fas fa-arrow-down"></i> Ground Level (mm) *</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="groundLevel"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Longitude *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="longitude"
+                  step="any"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Latitude *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="latitude"
+                  step="any"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="getCurrentLocation()"
+              style="margin-bottom: 20px"
+            >
+              <i class="fas fa-location-arrow"></i> Get Current Location
+            </button>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%">
+              <i class="fas fa-save"></i> Register Pothole
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="statusModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-edit"></i> Update Status</h3>
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="updateStatusForm" onsubmit="handleUpdateStatus(event)">
+          <div class="form-group">
+            <label>New Status</label>
+            <select class="form-control" id="newStatus" required>
+              <option value="pending">Pending</option>
+              <option value="inprocess">In Process</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            <i class="fas fa-check"></i> Update Status
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // API Configuration
+      const API_URL = "http://localhost:5000/api";
+      let currentUser = null;
+      let currentPotholeId = null;
+      let vehicleChart = null;
+      let statusChart = null;
+
+      // Check if user is logged in
+      function checkAuth() {
+        const token = localStorage.getItem("token");
+        const user = localStorage.getItem("user");
+
+        if (token && user) {
+          currentUser = JSON.parse(user);
+          document.getElementById("authContainer").classList.add("hidden");
+          document.getElementById("appContainer").classList.remove("hidden");
+          document.getElementById("userName").textContent = currentUser.name;
+          document.getElementById("userRole").textContent = currentUser.role;
+          loadPotholes();
+        } else {
+          document.getElementById("authContainer").classList.remove("hidden");
+          document.getElementById("appContainer").classList.add("hidden");
+        }
+      }
+
+      // Switch Auth Tabs
+      function switchAuthTab(tab) {
+        const tabs = document.querySelectorAll(".auth-tab");
+        tabs.forEach((t) => t.classList.remove("active"));
+
+        if (tab === "login") {
+          tabs[0].classList.add("active");
+          document.getElementById("loginForm").classList.remove("hidden");
+          document.getElementById("registerForm").classList.add("hidden");
+        } else {
+          tabs[1].classList.add("active");
+          document.getElementById("loginForm").classList.add("hidden");
+          document.getElementById("registerForm").classList.remove("hidden");
+        }
+
+        document.getElementById("authAlert").innerHTML = "";
+      }
+
+      // Handle Login
+      async function handleLogin(e) {
+        e.preventDefault();
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+          const response = await fetch(`${API_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data));
+            checkAuth();
+          } else {
+            showAuthAlert(data.message, "error");
+          }
+        } catch (error) {
+          showAuthAlert("Login failed. Please try again.", "error");
+        }
+      }
+
+      // Handle Register
+      async function handleRegister(e) {
+        e.preventDefault();
+
+        const name = document.getElementById("registerName").value;
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
+        const role = document.getElementById("registerRole").value;
+
+        try {
+          const response = await fetch(`${API_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password, role }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data));
+            checkAuth();
+          } else {
+            showAuthAlert(data.message, "error");
+          }
+        } catch (error) {
+          showAuthAlert("Registration failed. Please try again.", "error");
+        }
+      }
+
+      // Handle Logout
+      function handleLogout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        currentUser = null;
+        checkAuth();
+      }
+
+      // Switch Tabs
+      function switchTab(tab) {
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".tab-content");
+
+        tabs.forEach((t) => t.classList.remove("active"));
+        contents.forEach((c) => c.classList.remove("active"));
+
+        if (tab === "list") {
+          tabs[0].classList.add("active");
+          document.getElementById("listTab").classList.add("active");
+          loadPotholes();
+        } else if (tab === "analysis") {
+          tabs[1].classList.add("active");
+          document.getElementById("analysisTab").classList.add("active");
+          loadAnalysis();
+        } else {
+          tabs[2].classList.add("active");
+          document.getElementById("registerTab").classList.add("active");
+        }
+      }
+
+      // Load Analysis Data
+      async function loadAnalysis() {
+        try {
+          const response = await fetch(`${API_URL}/potholes/list`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            const potholes = data.data;
+
+            // Calculate statistics
+            const totalPotholes = potholes.length;
+            const pendingCount = potholes.filter(
+              (p) => p.pothole_status === "pending"
+            ).length;
+            const completedCount = potholes.filter(
+              (p) => p.pothole_status === "completed"
+            ).length;
+            const inProcessCount = potholes.filter(
+              (p) => p.pothole_status === "inprocess"
+            ).length;
+
+            // Update statistics cards
+            document.getElementById("totalPotholes").textContent =
+              totalPotholes;
+            document.getElementById("pendingReports").textContent =
+              pendingCount;
+            document.getElementById("completedRepairs").textContent =
+              completedCount;
+
+            // Prepare vehicle data
+            const vehicleData = {};
+            potholes.forEach((p) => {
+              vehicleData[p.vehicle_name] =
+                (vehicleData[p.vehicle_name] || 0) + 1;
+            });
+
+            const vehicleLabels = Object.keys(vehicleData);
+            const vehicleCounts = Object.values(vehicleData);
+
+            // Create Vehicle Chart
+            const vehicleCtx = document
+              .getElementById("vehicleChart")
+              .getContext("2d");
+
+            if (vehicleChart) {
+              vehicleChart.destroy();
+            }
+
+            vehicleChart = new Chart(vehicleCtx, {
+              type: "bar",
+              data: {
+                labels: vehicleLabels,
+                datasets: [
+                  {
+                    label: "Potholes Reported",
+                    data: vehicleCounts,
+                    backgroundColor: [
+                      "rgba(99, 132, 255, 0.7)",
+                      "rgba(255, 128, 128, 0.7)",
+                      "rgba(255, 165, 100, 0.7)",
+                      "rgba(128, 201, 128, 0.7)",
+                      "rgba(255, 206, 86, 0.7)",
+                    ],
+                    borderColor: [
+                      "rgba(99, 132, 255, 1)",
+                      "rgba(255, 128, 128, 1)",
+                      "rgba(255, 165, 100, 1)",
+                      "rgba(128, 201, 128, 1)",
+                      "rgba(255, 206, 86, 1)",
+                    ],
+                    borderWidth: 2,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      stepSize: 1,
+                    },
+                  },
+                },
+              },
+            });
+
+            // Create Status Chart (Doughnut)
+            const statusCtx = document
+              .getElementById("statusChart")
+              .getContext("2d");
+
+            if (statusChart) {
+              statusChart.destroy();
+            }
+
+            statusChart = new Chart(statusCtx, {
+              type: "doughnut",
+              data: {
+                labels: ["Pending", "In Process", "Completed"],
+                datasets: [
+                  {
+                    data: [pendingCount, inProcessCount, completedCount],
+                    backgroundColor: [
+                      "rgba(245, 158, 11, 0.8)",
+                      "rgba(59, 130, 246, 0.8)",
+                      "rgba(16, 185, 129, 0.8)",
+                    ],
+                    borderColor: [
+                      "rgba(245, 158, 11, 1)",
+                      "rgba(59, 130, 246, 1)",
+                      "rgba(16, 185, 129, 1)",
+                    ],
+                    borderWidth: 2,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "bottom",
+                  },
+                },
+              },
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load analysis:", error);
+        }
+      }
+
+      // Preview Image
+      function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById("preview-image");
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.classList.remove("hidden");
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      // Get Current Location
+      function getCurrentLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              document.getElementById("latitude").value =
+                position.coords.latitude;
+              document.getElementById("longitude").value =
+                position.coords.longitude;
+              showAppAlert("Location captured successfully!", "success");
+            },
+            (error) => {
+              showAppAlert(
+                "Unable to get location. Please enter manually.",
+                "error"
+              );
+            }
+          );
+        } else {
+          showAppAlert(
+            "Geolocation is not supported by your browser.",
+            "error"
+          );
+        }
+      }
+
+      // Handle Register Pothole
+      async function handleRegisterPothole(e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append(
+          "image",
+          document.getElementById("imageInput").files[0]
+        );
+        formData.append("distance", document.getElementById("distance").value);
+        formData.append(
+          "vehicle_name",
+          document.getElementById("vehicleName").value
+        );
+        formData.append(
+          "vehicle_ground_level",
+          document.getElementById("groundLevel").value
+        );
+        formData.append(
+          "longitude",
+          document.getElementById("longitude").value
+        );
+        formData.append("latitude", document.getElementById("latitude").value);
+
+        try {
+          const response = await fetch(`${API_URL}/potholes/register`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showAppAlert("Pothole registered successfully!", "success");
+            document.getElementById("potholeForm").reset();
+            document.getElementById("preview-image").classList.add("hidden");
+            switchTab("list");
+          } else {
+            showAppAlert(data.message, "error");
+          }
+        } catch (error) {
+          showAppAlert(
+            "Failed to register pothole. Please try again.",
+            "error"
+          );
+        }
+      }
+
+      // Load Potholes
+      async function loadPotholes() {
+        const status = document.getElementById("statusFilter").value;
+        const potholeList = document.getElementById("potholeList");
+
+        potholeList.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const url = `${API_URL}/potholes/list${
+            status ? `?status=${status}` : ""
+          }`;
+          const response = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.data.length > 0) {
+            potholeList.innerHTML = data.data
+              .map(
+                (pothole) => `
+                        <div class="pothole-card">
+                            <img src="${API_URL.replace("/api", "")}${
+                  pothole.image
+                }" 
+                                 alt="Pothole" class="pothole-image" 
+                                 onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
+                            <div class="pothole-content">
+                                <div class="pothole-header">
+                                    <span class="status-badge status-${
+                                      pothole.pothole_status
+                                    }">
+                                        ${pothole.pothole_status}
+                                    </span>
+                                </div>
+                                <div class="pothole-details">
+                                    <div class="detail-row">
+                                        <i class="fas fa-ruler"></i>
+                                        <span>Distance: ${
+                                          pothole.distance
+                                        }m</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <i class="fas fa-car"></i>
+                                        <span>${pothole.vehicle_name}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <i class="fas fa-arrow-down"></i>
+                                        <span>Ground Level: ${
+                                          pothole.vehicle_ground_level
+                                        }mm</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${pothole.gps.latitude.toFixed(
+                                          4
+                                        )}, ${pothole.gps.longitude.toFixed(
+                  4
+                )}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <i class="fas fa-user"></i>
+                                        <span>${pothole.reportedBy.name}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>${new Date(
+                                          pothole.createdAt
+                                        ).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                ${
+                                  currentUser.role === "admin"
+                                    ? `
+                                    <div class="pothole-actions">
+                                        <button class="btn btn-primary btn-sm" onclick="openStatusModal('${pothole._id}', '${pothole.pothole_status}')">
+                                            <i class="fas fa-edit"></i> Update Status
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="deletePothole('${pothole._id}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                `
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                    `
+              )
+              .join("");
+          } else {
+            potholeList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                            <i class="fas fa-info-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p>No potholes found.</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          potholeList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--danger);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>Failed to load potholes.</p>
+                    </div>
+                `;
+        }
+      }
+
+      // Open Status Modal
+      function openStatusModal(id, currentStatus) {
+        currentPotholeId = id;
+        document.getElementById("newStatus").value = currentStatus;
+        document.getElementById("statusModal").classList.add("active");
+      }
+
+      // Close Modal
+      function closeModal() {
+        document.getElementById("statusModal").classList.remove("active");
+        currentPotholeId = null;
+      }
+
+      // Handle Update Status
+      async function handleUpdateStatus(e) {
+        e.preventDefault();
+
+        const newStatus = document.getElementById("newStatus").value;
+
+        try {
+          const response = await fetch(
+            `${API_URL}/potholes/update/${currentPotholeId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              body: JSON.stringify({ pothole_status: newStatus }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            showAppAlert("Status updated successfully!", "success");
+            closeModal();
+            loadPotholes();
+          } else {
+            showAppAlert(data.message, "error");
+          }
+        } catch (error) {
+          showAppAlert("Failed to update status. Please try again.", "error");
+        }
+      }
+
+      // Delete Pothole
+      async function deletePothole(id) {
+        if (!confirm("Are you sure you want to delete this pothole?")) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/potholes/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showAppAlert("Pothole deleted successfully!", "success");
+            loadPotholes();
+          } else {
+            showAppAlert(data.message, "error");
+          }
+        } catch (error) {
+          showAppAlert("Failed to delete pothole. Please try again.", "error");
+        }
+      }
+
+      // Show Auth Alert
+      function showAuthAlert(message, type) {
+        const alert = document.getElementById("authAlert");
+        alert.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${
+                      type === "success" ? "check-circle" : "exclamation-circle"
+                    }"></i>
+                    ${message}
+                </div>
+            `;
+        setTimeout(() => (alert.innerHTML = ""), 5000);
+      }
+
+      // Show App Alert
+      function showAppAlert(message, type) {
+        const alert = document.getElementById("appAlert");
+        alert.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${
+                      type === "success" ? "check-circle" : "exclamation-circle"
+                    }"></i>
+                    ${message}
+                </div>
+            `;
+        setTimeout(() => (alert.innerHTML = ""), 5000);
+      }
+
+      // Initialize App
+      checkAuth();
+    </script>
+  </body>
+</html>
